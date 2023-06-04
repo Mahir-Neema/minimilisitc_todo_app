@@ -116,7 +116,7 @@ body {
     border: 1px solid #ccc;
   }
   
-  button {
+  .Addtodo{
     padding: 10px 20px;
     background-color: #4CAF50;
     color: white;
@@ -125,7 +125,7 @@ body {
     cursor: pointer;
   }
   
-  button:hover {
+  .Addtodo:hover {
     background-color: #45a049;
   }
   
@@ -134,6 +134,20 @@ body {
     color: #fff;
     text-decoration: line-through;
     transition: color 0.3s ease;
+  }
+
+  .trashbtn{
+    background-color: #ffffff00;
+    color: rgb(32, 31, 31);
+    border: none;
+    cursor: pointer;
+  }
+
+  .trashbtn:hover{
+    background-color: #ffffff00;
+    color: rgb(0, 204, 255);
+    border: none;
+    cursor: pointer;
   }
   
 

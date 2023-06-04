@@ -1,29 +1,30 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
+import { FaTrashAlt } from "react-icons/fa";
 
 export default function App() {
   const [todos, setTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState('');
+  const [newTodo, setNewTodo] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
 
   useEffect(() => {
-    const storedTodos = localStorage.getItem('todos');
+    const storedTodos = localStorage.getItem("todos");
     if (storedTodos) {
       setTodos(JSON.parse(storedTodos));
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('todos', JSON.stringify(todos));
+    localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
   const handleAddTodo = () => {
-    if (newTodo.trim() !== '') {
+    if (newTodo.trim() !== "") {
       const newTodoObj = { text: newTodo, completed: false };
       setTodos([...todos, newTodoObj]);
-      setNewTodo('');
+      setNewTodo("");
       setShowEmoji(false);
-      localStorage.setItem('todos', JSON.stringify([...todos, newTodoObj]));
+      localStorage.setItem("todos", JSON.stringify([...todos, newTodoObj]));
     }
   };
 
@@ -35,11 +36,18 @@ export default function App() {
     setTimeout(() => {
       setShowEmoji(false);
     }, 2000);
-    localStorage.setItem('todos', JSON.stringify(updatedTodos));
+    localStorage.setItem("todos", JSON.stringify(updatedTodos));
+  };
+
+  const handleDeleteTodo = (index) => {
+    const updatedTodos = [...todos];
+    updatedTodos.splice(index, 1);
+    setTodos(updatedTodos);
+    localStorage.setItem("todos", JSON.stringify(updatedTodos));
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleAddTodo();
     }
   };
@@ -47,9 +55,7 @@ export default function App() {
   const EmojiAnimation = () => {
     return (
       <div className="emoji-animation">
-        <div className="emoji-popup">
-          🥳
-        </div>
+        <div className="emoji-popup">🥳</div>
       </div>
     );
   };
@@ -64,21 +70,30 @@ export default function App() {
         onKeyPress={handleKeyPress}
         placeholder="Enter a new todo"
       />
-      <button onClick={handleAddTodo}>Add Todo</button>
+      <button onClick={handleAddTodo} className="Addtodo">Add Todo</button>
       <ul>
         {todos.map((todo, index) => (
           <li
             key={index}
-            style={{ backgroundColor: todo.completed ? '#5E35B1' : 'white',
-            color: todo.completed ? 'white' : 'black',
-            transform: todo.completed ? 'scale(1.02)' : 'scale(1)' }}
+            style={{
+              backgroundColor: todo.completed ? "#5E35B1" : "white",
+              color: todo.completed ? "white" : "black",
+              transform: todo.completed ? "scale(1.02)" : "scale(1)",
+              display:"flex",
+              justifyContent:"space-between"
+            }}
           >
-            <input
-              type="checkbox"
-              checked={todo.completed}
-              onChange={() => handleCheckboxChange(index)}
-            />
-            {todo.text}
+            <div>
+              <input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => handleCheckboxChange(index)}
+              />
+              {todo.text}
+            </div>
+            <button onClick={() => handleDeleteTodo(index)} className="trashbtn">
+              <FaTrashAlt/>
+            </button>
           </li>
         ))}
       </ul>
