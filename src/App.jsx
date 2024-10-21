@@ -1,49 +1,40 @@
-import "./App.css";
 import React, { useState, useEffect } from "react";
-import { FaTrashAlt } from "react-icons/fa";
+import TodoList from "./components/TodoList";
+import ThemeToggle from "./components/ThemeToggle";
+import Confetti from "./components/Confetti";
+import "./App.css";
 
 export default function App() {
-  const [todos, setTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState("");
-  const [showEmoji, setShowEmoji] = useState(false);
+  const [todos, setTodos] = useState(() => {
+    const savedTodos = localStorage.getItem("todos");
+    return savedTodos ? JSON.parse(savedTodos) : [];
+  });
 
-  useEffect(() => {
-    const storedTodos = localStorage.getItem("todos");
-    if (storedTodos) {
-      setTodos(JSON.parse(storedTodos));
-    }
-  }, []);
+  const [newTodo, setNewTodo] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(
+    localStorage.getItem("darkMode") === "true"
+  );
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
+
+  useEffect(() => {
+    localStorage.setItem("darkMode", isDarkMode);
+    if (isDarkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  }, [isDarkMode]);
 
   const handleAddTodo = () => {
     if (newTodo.trim() !== "") {
       const newTodoObj = { text: newTodo, completed: false };
       setTodos([...todos, newTodoObj]);
       setNewTodo("");
-      setShowEmoji(false);
-      localStorage.setItem("todos", JSON.stringify([...todos, newTodoObj]));
     }
-  };
-
-  const handleCheckboxChange = (index) => {
-    const updatedTodos = [...todos];
-    updatedTodos[index].completed = !updatedTodos[index].completed;
-    setTodos(updatedTodos);
-    setShowEmoji(true);
-    setTimeout(() => {
-      setShowEmoji(false);
-    }, 2000);
-    localStorage.setItem("todos", JSON.stringify(updatedTodos));
-  };
-
-  const handleDeleteTodo = (index) => {
-    const updatedTodos = [...todos];
-    updatedTodos.splice(index, 1);
-    setTodos(updatedTodos);
-    localStorage.setItem("todos", JSON.stringify(updatedTodos));
   };
 
   const handleKeyPress = (e) => {
@@ -52,52 +43,36 @@ export default function App() {
     }
   };
 
-  const EmojiAnimation = () => {
-    return (
-      <div className="emoji-animation">
-        <div className="emoji-popup">🥳</div>
-      </div>
-    );
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
   };
 
   return (
-    <div className="app">
-      <h1>Todo List</h1>
-      <input
-        type="text"
-        value={newTodo}
-        onChange={(e) => setNewTodo(e.target.value)}
-        onKeyPress={handleKeyPress}
-        placeholder="Enter a new todo"
-      />
-      <button onClick={handleAddTodo} className="Addtodo">Add Todo</button>
-      <ul>
-        {todos.map((todo, index) => (
-          <li
-            key={index}
-            style={{
-              backgroundColor: todo.completed ? "#5E35B1" : "white",
-              color: todo.completed ? "white" : "black",
-              transform: todo.completed ? "scale(1.02)" : "scale(1)",
-              display:"flex",
-              justifyContent:"space-between"
-            }}
-          >
-            <div>
-              <input
-                type="checkbox"
-                checked={todo.completed}
-                onChange={() => handleCheckboxChange(index)}
-              />
-              {todo.text}
-            </div>
-            <button onClick={() => handleDeleteTodo(index)} className="trashbtn">
-              <FaTrashAlt/>
-            </button>
-          </li>
-        ))}
-      </ul>
-      {showEmoji && <EmojiAnimation />}
+    <div className={`app ${isDarkMode ? 'dark' : 'light'}`}>
+      <div className="header">
+        <h1>Todo List</h1>
+        <ThemeToggle
+          toggleDarkMode={toggleDarkMode}
+          isDarkMode={isDarkMode} />
+      </div>
+      <div className="input-container">
+        <input
+          type="text"
+          value={newTodo}
+          onChange={(e) => setNewTodo(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="Enter a New Todo..."
+          className="todo-input"
+        />
+        <button onClick={handleAddTodo} className="add-todo">
+          Add Todo
+        </button>
+      </div>
+      <TodoList
+        todos={todos}
+        setTodos={setTodos}
+        setShowConfetti={setShowConfetti} />
+      {showConfetti && <Confetti />}
     </div>
   );
 }
